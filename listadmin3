@@ -179,7 +179,7 @@ class Mailman3UI:
         count_select = page.soup.find("select", attrs={'name': 'count'})
         if not count_select:
             # Assume no held messages (could check for "There are currently no subscriptions
-            # requests for thist list." message)
+            # requests for this list." message)
             return []
 
         if DEBUG:
