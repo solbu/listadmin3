@@ -188,6 +188,11 @@ class Mailman3UI:
         sub_table = page.soup.find("h2")
         sub_table = sub_table.find_next_sibling("div")
         sub_table = sub_table.find("table")
+        sub_headers = sub_table.find("thead")
+        header_row = sub_headers.find("tr")
+        # If we've got 3 headers we have a date as well as the email address / action.
+        has_date = (len(header_row.find_all("th")) == 3)
+
         sub_list = sub_table.find("tbody")
         subs = []
         for sub_row in sub_list.find_all("tr"):
@@ -195,6 +200,8 @@ class Mailman3UI:
             row_data = sub_row.find("td")
             sub["email"] = row_data.text.strip()
             row_data = row_data.find_next_sibling("td")
+            if has_date:
+                row_data = row_data.find_next_sibling("td")
             req_hash = row_data.find("form")
             if req_hash is not None:
                 req_hash = re.search(r'.*/handle_subscription_request/([^/]+)/',
