@@ -206,6 +206,9 @@ class Mailman3UI:
                         req_hash['href'])
             if req_hash:
                 sub["req_hash"] = req_hash.group(1)
+            for field in row_data.find_all("input"):
+                if field["name"] == "csrfmiddlewaretoken":
+                    self.token = field["value"]
 
             subs.append(sub)
 
@@ -218,9 +221,15 @@ class Mailman3UI:
         get_pending_subscriptions.
         """
 
-        page = self._browser.open(self._baseurl + 'postorius/lists/' + listname +
+        page = self._browser.post(self._baseurl + 'postorius/lists/' + listname +
                                   '/handle_subscription_request/' +
-                                  req_hash + '/' + action)
+                                  req_hash + '/',
+                                  data = {
+                                      "csrfmiddlewaretoken": self.token,
+                                      action: action,
+                                  },
+                                  headers={'referer': self._baseurl + 'postorius/lists/' + listname + '/subscription_requests'},
+                                  )
         if DEBUG:
             print(page.text)
 
